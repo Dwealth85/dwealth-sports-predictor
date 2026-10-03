@@ -3,136 +3,107 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DWEALTH SPORTS PREDICTOR</title>
+<title>DWEALTH SPORTS PREDICTOR V2</title>
 <style>
-:root{color-scheme:dark;--bg:#08111f;--panel:#101d31;--card:#17263c;--text:#f4f7fb;--muted:#aab7c9;--line:#2a3b55;--accent:#38bdf8}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#07101c,#0d1b2d);font-family:Arial,Helvetica,sans-serif;color:var(--text)}
-main{max-width:900px;margin:auto;padding:22px 14px 40px}.hero{margin-bottom:16px}.hero h1{margin:0 0 6px;font-size:28px}.hero p{margin:0;color:var(--muted)}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin:14px 0}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
-select,button{width:100%;min-height:46px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15px}
-select{background:#0a1525;color:var(--text)}button{background:#075985;color:#fff;font-weight:700;cursor:pointer}
-button:hover{filter:brightness(1.1)}
-.title{font-size:16px;font-weight:700;margin-bottom:12px}.match{font-size:21px;font-weight:800}.small{font-size:12px;color:var(--muted)}
-.bars{display:grid;gap:11px;margin-top:16px}.bar{display:grid;grid-template-columns:90px 1fr 55px;gap:8px;align-items:center;font-size:13px}.track{height:10px;background:#26364d;border-radius:20px;overflow:hidden}.fill{height:100%;width:0;background:var(--accent)}
-.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:16px}.metric,.score{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:11px}.metric b{display:block;font-size:18px;margin-top:4px}.scores{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.score{text-align:center}.score b{display:block;font-size:18px;margin:4px 0}.pills{display:flex;flex-wrap:wrap;gap:6px}.pill{padding:5px 8px;border-radius:999px;background:#20334d;color:#d8e5f3;font-size:11px}
-.note{color:var(--muted);font-size:12px;line-height:1.55;margin-top:12px}
-@media(max-width:600px){main{padding:16px 10px}.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}.metric:last-child{grid-column:1/-1}.bar{grid-template-columns:76px 1fr 48px}.hero h1{font-size:23px}}
+:root{--bg:#08111f;--card:#101d30;--line:#24354d;--text:#f4f7fb;--muted:#9eb0c8;--accent:#42d392}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#07101c,#0d1930);font-family:Arial,sans-serif;color:var(--text)}
+.wrap{max-width:1050px;margin:auto;padding:22px}.hero{padding:24px 0}.badge{display:inline-block;padding:6px 10px;border:1px solid #31506f;border-radius:999px;color:#8fdcff;font-size:12px}.hero h1{font-size:32px;margin:12px 0 6px}.hero p{color:var(--muted);margin:0}
+.card{background:rgba(16,29,48,.94);border:1px solid var(--line);border-radius:18px;padding:18px;margin:16px 0;box-shadow:0 12px 35px #0003}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:700px){.grid{grid-template-columns:1fr}.hero h1{font-size:26px}}
+label{display:block;color:var(--muted);font-size:13px;margin-bottom:7px}select,button{width:100%;padding:13px;border-radius:10px;border:1px solid #31445f;background:#0a1525;color:#fff;font-size:15px}button{cursor:pointer;background:#153b32;border-color:#2d8068;font-weight:700}
+.status{padding:12px;border-radius:10px;background:#0a1525;color:#9eb0c8;font-size:13px}.status.ok{color:#8ff0bd}.status.err{color:#ff9b9b}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.kpi{padding:14px;background:#0a1525;border-radius:12px;text-align:center}.kpi b{display:block;font-size:22px}.kpi span{color:var(--muted);font-size:12px}
+.bar{height:12px;background:#17263a;border-radius:20px;overflow:hidden;margin:7px 0}.bar i{display:block;height:100%}
+.results{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}@media(max-width:700px){.results{grid-template-columns:1fr}}
+.result{padding:15px;background:#0a1525;border:1px solid #203149;border-radius:12px}.result strong{font-size:17px}.small{color:var(--muted);font-size:12px}.score{font-size:24px;font-weight:800}
+footer{color:#71849d;font-size:12px;padding:12px 0 35px}
 </style>
 </head>
 <body>
-<main>
+<div class="wrap">
 <section class="hero">
+<span class="badge">V2 • REAL FOOTBALL DATA PIPELINE</span>
 <h1>⚽ DWEALTH SPORTS PREDICTOR</h1>
-<p>Web V1 • Probabilistic real-football prediction prototype</p>
+<p>Real fixtures and published football data, with a transparent probability model.</p>
 </section>
 
-<section class="panel">
-<div class="title">Select Match</div>
+<div class="card">
+<div id="status" class="status">Loading real football data…</div>
+</div>
+
+<div class="card">
 <div class="grid">
-<div><label for="league">Competition</label><select id="league"></select></div>
-<div><label for="home">Home team</label><select id="home"></select></div>
-<div><label for="away">Away team</label><select id="away"></select></div>
-<div style="display:flex;align-items:end"><button id="predict">🔮 Generate Prediction</button></div>
+<div><label>Competition</label><select id="league"></select></div>
+<div><label>Match</label><select id="match"></select></div>
 </div>
-</section>
-
-<section class="panel" aria-live="polite">
-<div class="small">Prediction</div>
-<div id="match" class="match">Choose a match</div>
-<div class="bars">
-<div class="bar"><span>Home Win</span><div class="track"><div id="bh" class="fill"></div></div><b id="ph">—</b></div>
-<div class="bar"><span>Draw</span><div class="track"><div id="bd" class="fill"></div></div><b id="pd">—</b></div>
-<div class="bar"><span>Away Win</span><div class="track"><div id="ba" class="fill"></div></div><b id="pa">—</b></div>
+<br><button id="predict">Generate Prediction</button>
 </div>
-<div class="metrics">
-<div class="metric"><span class="small">Over 1.5</span><b id="o15">—</b></div>
-<div class="metric"><span class="small">Over 2.5</span><b id="o25">—</b></div>
-<div class="metric"><span class="small">Over 3.5</span><b id="o35">—</b></div>
-<div class="metric"><span class="small">BTTS</span><b id="btts">—</b></div>
-<div class="metric"><span class="small">Expected goals</span><b id="xg">—</b></div>
+
+<div id="output" class="card" style="display:none"></div>
+
+<div class="card">
+<h3>📅 Upcoming real fixtures</h3>
+<div id="fixtures" class="results"><div class="small">Loading…</div></div>
 </div>
-<div class="title" style="margin-top:18px">Most likely correct scores</div>
-<div id="scores" class="scores"></div>
-<div id="reason" class="note">This V1 uses embedded demonstration team-strength ratings. It does not guarantee results.</div>
-</section>
 
-<section class="panel">
-<div class="title">16 Competitions</div>
-<div id="coverage" class="pills"></div>
-<div class="note">Next production stage: connect this interface to permitted live football data, historical results, injuries, lineups and other features, then validate the model with chronological backtesting.</div>
-</section>
-</main>
-
+<footer>
+DWEALTH SPORTS PREDICTOR V2 is a statistical information tool. Probabilities are estimates, not guarantees or financial advice.
+</footer>
+</div>
 <script>
-const leagues={
-"Premier League":["Arsenal","Liverpool","Manchester City","Manchester United","Chelsea","Tottenham","Newcastle United","Aston Villa","Brighton","Everton"],
-"UEFA Champions League":["Real Madrid","Barcelona","Bayern Munich","Paris Saint-Germain","Manchester City","Liverpool","Inter Milan","Arsenal","Juventus","Borussia Dortmund"],
-"UEFA Europa League":["Roma","Athletic Club","Porto","Ajax","Tottenham","Real Betis","Rangers","Fenerbahce","Lyon","Freiburg"],
-"La Liga":["Real Madrid","Barcelona","Atletico Madrid","Athletic Club","Real Sociedad","Villarreal","Sevilla","Real Betis","Valencia","Girona"],
-"Serie A":["Inter Milan","AC Milan","Juventus","Napoli","Roma","Lazio","Atalanta","Fiorentina","Bologna","Torino"],
-"Bundesliga":["Bayern Munich","Borussia Dortmund","Bayer Leverkusen","RB Leipzig","Eintracht Frankfurt","Stuttgart","Freiburg","Wolfsburg","Mainz","Werder Bremen"],
-"Ligue 1":["Paris Saint-Germain","Marseille","Monaco","Lyon","Lille","Nice","Lens","Rennes","Nantes","Strasbourg"],
-"Belgium Pro League":["Club Brugge","Union Saint-Gilloise","Anderlecht","Genk","Gent","Antwerp","Standard Liege","Mechelen"],
-"Estonia Premium Liiga":["Flora Tallinn","Levadia Tallinn","Nomme Kalju","Paide Linnameeskond","Tammeka","Narva Trans","Kuressaare","Parnu Vaprus"],
-"Estonia Esiliiga":["FCI Levadia U21","Flora U21","Tartu Welco","Viimsi","Tallinna Kalev U21","Elva","Laagri","FC Tallinn"],
-"Switzerland Super League":["Young Boys","Basel","Zurich","Lugano","Servette","St Gallen","Sion","Lucerne"],
-"Türkiye Super Lig":["Galatasaray","Fenerbahce","Besiktas","Trabzonspor","Basaksehir","Adana Demirspor","Konyaspor","Antalyaspor"],
-"Türkiye 1. Lig":["Kocaelispor","Genclerbirligi","Sakaryaspor","Bandirmaspor","Erzurumspor","Boluspor","Goztepe","Erokspor"],
-"USA MLS":["Inter Miami","LAFC","LA Galaxy","Seattle Sounders","Atlanta United","Columbus Crew","FC Cincinnati","New York City FC"],
-"Wales Cymru Premier":["The New Saints","Penybont","Caernarfon Town","Bala Town","Barry Town United","Haverfordwest County","Newtown","Cardiff Met"],
-"Ukraine Premier League":["Dynamo Kyiv","Shakhtar Donetsk","Polissya Zhytomyr","Kryvbas Kryvyi Rih","Karpaty Lviv","Vorskla Poltava","Zorya Luhansk","Rukh Lviv"]
-};
-
-const strength={
-"Arsenal":88,"Liverpool":90,"Manchester City":91,"Manchester United":82,"Chelsea":84,"Tottenham":81,"Newcastle United":82,"Aston Villa":84,"Brighton":78,"Everton":75,
-"Real Madrid":93,"Barcelona":91,"Atletico Madrid":88,"Bayern Munich":92,"Paris Saint-Germain":90,"Inter Milan":89,"Juventus":84,"Borussia Dortmund":85,"Bayer Leverkusen":87,"RB Leipzig":82,
-"AC Milan":84,"Napoli":86,"Roma":82,"Lazio":80,"Atalanta":84,"Fiorentina":79,"Monaco":83,"Marseille":81,"Lyon":78,"Lille":82,"Ajax":80,"Porto":84,"Benfica":86,
-"Club Brugge":79,"Anderlecht":76,"Genk":75,"Young Boys":77,"Basel":75,"Galatasaray":85,"Fenerbahce":84,"Besiktas":79,"Trabzonspor":77,"Inter Miami":82,"LAFC":80,"LA Galaxy":76,"Seattle Sounders":78,"Columbus Crew":78,"The New Saints":72,"Dynamo Kyiv":80,"Shakhtar Donetsk":82
-};
-
-const $=id=>document.getElementById(id), league=$("league"), home=$("home"), away=$("away");
-Object.keys(leagues).forEach(l=>league.add(new Option(l,l)));
-function fillTeams(){
-  home.innerHTML=""; away.innerHTML="";
-  leagues[league.value].forEach(t=>{home.add(new Option(t,t));away.add(new Option(t,t));});
-  if(away.options.length>1) away.selectedIndex=1;
-}
-league.addEventListener("change",fillTeams); fillTeams();
-
-function fact(n){let r=1;for(let i=2;i<=n;i++)r*=i;return r}
-function pois(l,k){return Math.exp(-l)*Math.pow(l,k)/fact(k)}
+const state={data:null};
+const $=id=>document.getElementById(id);
 function pct(x){return Math.round(x*100)+"%"}
-
-function predict(){
-  const h=home.value,a=away.value;
-  if(h===a){$("reason").textContent="Please select two different teams.";return}
-  const hs=strength[h]??72, as=strength[a]??72;
-  const diff=hs+3-as;
-  const lh=Math.max(.35,1.48+diff*.035), la=Math.max(.25,1.12-diff*.025);
-  const m=[]; let sum=0;
-  for(let i=0;i<=7;i++)for(let j=0;j<=7;j++){const p=pois(lh,i)*pois(la,j);m.push({i,j,p});sum+=p}
-  m.forEach(x=>x.p/=sum);
-  const ph=m.filter(x=>x.i>x.j).reduce((s,x)=>s+x.p,0);
-  const pd=m.filter(x=>x.i===x.j).reduce((s,x)=>s+x.p,0);
-  const pa=1-ph-pd;
-  const over=n=>1-m.filter(x=>x.i+x.j<=n).reduce((s,x)=>s+x.p,0);
-  const btts=1-m.filter(x=>x.i===0||x.j===0).reduce((s,x)=>s+x.p,0);
-  const top=m.slice().sort((x,y)=>y.p-x.p).slice(0,3);
-
-  $("match").textContent=h+" vs "+a;
-  [["ph",ph],["pd",pd],["pa",pa]].forEach(([id,v])=>$(id).textContent=pct(v));
-  [["bh",ph],["bd",pd],["ba",pa]].forEach(([id,v])=>$(id).style.width=pct(v));
-  $("o15").textContent=pct(over(1));$("o25").textContent=pct(over(2));$("o35").textContent=pct(over(3));
-  $("btts").textContent=pct(btts);$("xg").textContent=(lh+la).toFixed(2);
-  $("scores").innerHTML=top.map(x=>`<div class="score"><span class="small">Probability</span><b>${x.i} - ${x.j}</b><span class="small">${pct(x.p)}</span></div>`).join("");
-  const verdict=ph>=pd&&ph>=pa?"Home win has the highest modeled probability.":pa>=ph&&pa>=pd?"Away win has the highest modeled probability.":"Draw has the highest modeled probability.";
-  $("reason").textContent=verdict+" The V1 engine uses team-strength ratings, home advantage and a Poisson goal model. It is a prototype, not a guarantee.";
+function poisson(l,k){return Math.exp(-l)*Math.pow(l,k)/fact(k)}
+function fact(n){let r=1;for(let i=2;i<=n;i++)r*=i;return r}
+function prediction(home,away){
+  // Baseline transparent model. V2 will be expanded with historical team statistics.
+  const hs=home.strength||1500, as=away.strength||1500;
+  const diff=(hs-as)/400;
+  const homeGoals=Math.max(.35,1.42 + diff*.55);
+  const awayGoals=Math.max(.25,1.12 - diff*.45);
+  let h=0,d=0,a=0, rows=[];
+  for(let i=0;i<=6;i++)for(let j=0;j<=6;j++){
+    const p=poisson(homeGoals,i)*poisson(awayGoals,j);
+    if(i>j)h+=p; else if(i===j)d+=p; else a+=p;
+    rows.push({s:`${i}-${j}`,p});
+  }
+  const total=h+d+a||1; h/=total;d/=total;a/=total;
+  rows.sort((x,y)=>y.p-x.p);
+  const over15=1-Math.exp(-(homeGoals+awayGoals))*(1+(homeGoals+awayGoals));
+  let under25=0; for(let k=0;k<=2;k++)under25+=poisson(homeGoals+awayGoals,k);
+  const over25=1-under25;
+  let under35=0; for(let k=0;k<=3;k++)under35+=poisson(homeGoals+awayGoals,k);
+  const over35=1-under35;
+  const btts=1-Math.exp(-homeGoals)-Math.exp(-awayGoals)+Math.exp(-(homeGoals+awayGoals));
+  return {h,d,a,homeGoals,awayGoals,over15,over25,over35,btts,rows:rows.slice(0,3)}
 }
-$("predict").addEventListener("click",predict);
-$("coverage").innerHTML=Object.keys(leagues).map(x=>`<span class="pill">${x}</span>`).join("");
-predict();
+function render(){
+  const lg=$("league"), ms=$("match");
+  lg.innerHTML="";
+  const leagues=state.data.leagues||[];
+  leagues.forEach((l,i)=>{const o=document.createElement("option");o.value=i;o.textContent=l.name;lg.appendChild(o)});
+  function matches(){ms.innerHTML="";const l=leagues[+lg.value]||{matches:[]};(l.matches||[]).forEach((m,i)=>{const o=document.createElement("option");o.value=i;o.textContent=`${m.home} vs ${m.away} • ${new Date(m.date).toLocaleString()}`;ms.appendChild(o)})}
+  lg.onchange=matches; matches();
+  $("fixtures").innerHTML=leagues.flatMap(l=>(l.matches||[]).map(m=>`<div class="result"><strong>${m.home} vs ${m.away}</strong><div class="small">${l.name} • ${new Date(m.date).toLocaleString()}</div></div>`)).slice(0,12).join("")||"<div class='small'>No upcoming fixtures were published.</div>";
+  $("predict").onclick=()=>{
+    const l=leagues[+lg.value], m=(l.matches||[])[+ms.value]; if(!m)return;
+    const p=prediction({strength:m.homeStrength},{strength:m.awayStrength});
+    $("output").style.display="block";
+    $("output").innerHTML=`<h2>${m.home} vs ${m.away}</h2>
+    <div class="small">${l.name} • ${new Date(m.date).toLocaleString()}</div>
+    <h3>1X2</h3>
+    <div class="kpis"><div class="kpi"><b>${pct(p.h)}</b><span>Home</span></div><div class="kpi"><b>${pct(p.d)}</b><span>Draw</span></div><div class="kpi"><b>${pct(p.a)}</b><span>Away</span></div></div>
+    <h3>Goals & BTTS</h3>
+    <div class="kpis"><div class="kpi"><b>${pct(p.over15)}</b><span>Over 1.5</span></div><div class="kpi"><b>${pct(p.over25)}</b><span>Over 2.5</span></div><div class="kpi"><b>${pct(p.over35)}</b><span>Over 3.5</span></div></div>
+    <div class="kpi" style="margin-top:10px"><b>${pct(p.btts)}</b><span>BTTS</span></div>
+    <p>Expected goals: <b>${p.homeGoals.toFixed(2)}</b> – <b>${p.awayGoals.toFixed(2)}</b></p>
+    <h3>Most likely correct scores</h3>${p.rows.map(x=>`<div><b>${x.s}</b> — ${pct(x.p)}</div>`).join("")}
+    <p class="small">Model note: this V2 build uses the published fixture feed plus a transparent baseline strength input. Historical form/xG/injuries and calibrated backtesting are the next model layer.</p>`;
+  };
+}
+fetch("./data/football.json?ts="+Date.now()).then(r=>{if(!r.ok)throw Error("Data file unavailable");return r.json()}).then(d=>{
+  state.data=d;$("status").textContent=`Connected to published football data • Updated ${d.generated_at||"recently"}`;$("status").className="status ok";render()
+}).catch(e=>{$("status").textContent="Data not available yet. Run the GitHub Actions workflow once, then refresh this page.";$("status").className="status err"});
 </script>
-</body>
-</html>
+</body></html>
