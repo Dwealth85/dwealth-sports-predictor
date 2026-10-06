@@ -1,0 +1,266 @@
+name: DWEALTH SPORTS PREDICTOR V2 - Fetch Football Data
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 */6 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  update-football-data:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch real football fixtures
+        env:
+          API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.request
+          import urllib.parse
+          from datetime import datetime, timezone
+
+          API_KEY = os.environ["API_FOOTBALL_KEY"]
+
+          HEADERS = {
+              "x-apisports-key": API_KEY
+          }
+
+          BASE_URL = "https://v3.football.api-sports.io"
+
+          wanted = [
+              ("Premier League", "England"),
+              ("UEFA Champions League", "World"),
+              ("UEFA Europa League", "World"),
+              ("La Liga", "Spain"),
+              ("Serie A", "Italy"),
+              ("Bundesliga", "Germany"),
+              ("Ligue 1", "France"),
+              ("Pro League", "Belgium"),
+              ("Premium Liiga", "Estonia"),
+              ("Esiliiga", "Estonia"),
+              ("Super League", "Switzerland"),
+              ("Super Lig", "Turkey"),
+              ("1. Lig", "Turkey"),
+              ("Major League Soccer", "USA"),
+              ("Cymru Premier", "Wales"),
+              ("Premier League", "Ukraine")
+          ]
+
+          def get_json(url):
+              request = urllib.request.Request(
+                  url,
+                  headers=HEADERS
+              )
+
+              with urllib.request.urlopen(
+                  request,
+                  timeout=30
+              ) as response:
+                  return json.load(response)
+
+          def normalize(value):
+              return " ".join(
+                  (value or "").lower().replace("-", " ").split()
+              )
+
+          print("Getting league catalogue...")
+
+          catalogue_url = (
+              BASE_URL +
+              "/leagues?season=2026"
+          )
+
+          catalogue = get_json(catalogue_url)
+
+          leagues = []
+          used_ids = set()
+
+          for wanted_name, wanted_country in wanted:
+
+              for item in catalogue.get("response", []):
+
+                  league = item.get("league", {})
+                  country = item.get("country", {})
+
+                  league_name = league.get("name", "")
+                  country_name = country.get("name", "")
+
+                  name_match = (
+                      normalize(league_name)
+                      == normalize(wanted_name)
+                  )
+
+                  country_match = (
+                      wanted_country == "World"
+                      or normalize(country_name)
+                      == normalize(wanted_country)
+                  )
+
+                  if name_match and country_match:
+
+                      league_id = league.get("id")
+
+                      if league_id in used_ids:
+                          continue
+
+                      used_ids.add(league_id)
+
+                      leagues.append({
+                          "id": league_id,
+                          "name": league_name,
+                          "country": country_name,
+                          "matches": []
+                      })
+
+                      break
+
+          print(
+              "Matched competitions:",
+              len(leagues)
+          )
+
+          for league in leagues:
+
+              params = urllib.parse.urlencode({
+                  "league": league["id"],
+                  "season": 2026,
+                  "next": 10
+              })
+
+              url = (
+                  BASE_URL +
+                  "/fixtures?" +
+                  params
+              )
+
+              print(
+                  "Getting fixtures for",
+                  league["name"]
+              )
+
+              try:
+
+                  data = get_json(url)
+
+                  for item in data.get(
+                      "response",
+                      []
+                  ):
+
+                      fixture = item.get(
+                          "fixture",
+                          {}
+                      )
+
+                      teams = item.get(
+                          "teams",
+                          {}
+                      )
+
+                      home = teams.get(
+                          "home",
+                          {}
+                      )
+
+                      away = teams.get(
+                          "away",
+                          {}
+                      )
+
+                      league["matches"].append({
+                          "id": fixture.get("id"),
+                          "date": fixture.get("date"),
+                          "status": fixture.get(
+                              "status",
+                              {}
+                          ).get("short"),
+                          "home": home.get("name"),
+                          "away": away.get("name"),
+
+                          "homeStrength": 1500,
+                          "awayStrength": 1500
+                      })
+
+              except Exception as error:
+
+                  print(
+                      "Fixture request failed:",
+                      league["name"],
+                      error
+                  )
+
+          output = {
+              "generated_at":
+                  datetime.now(
+                      timezone.utc
+                  ).isoformat(),
+
+              "source":
+                  "API-Football",
+
+              "season":
+                  2026,
+
+              "leagues":
+                  leagues
+          }
+
+          os.makedirs(
+              "data",
+              exist_ok=True
+          )
+
+          with open(
+              "data/football.json",
+              "w",
+              encoding="utf-8"
+          ) as file:
+
+              json.dump(
+                  output,
+                  file,
+                  ensure_ascii=False,
+                  indent=2
+              )
+
+          total_matches = sum(
+              len(league["matches"])
+              for league in leagues
+          )
+
+          print(
+              "Football data created successfully."
+          )
+
+          print(
+              "Competitions:",
+              len(leagues)
+          )
+
+          print(
+              "Fixtures:",
+              total_matches
+          )
+          PY
+
+      - name: Save football data
+        run: |
+          git config user.name "DWEALTH SPORTS PREDICTOR"
+          git config user.email "actions@github.com"
+
+          git add data/football.json
+
+          if git diff --cached --quiet; then
+            echo "No changes to football data."
+          else
+            git commit -m "Update real football data"
+            git push
+          fi
